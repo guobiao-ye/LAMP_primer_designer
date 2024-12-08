@@ -1,0 +1,1 @@
+Put the background genome (such as hg39.fa) in the './data/resource' folder
