@@ -74,13 +74,14 @@ def extract_full_scores(input_csv):
 def merge_results(probabilities_csv="data/output/Intermediate_file/score_into_model.csv",
                   full_scores_csv="data/output/Intermediate_file/full_score_results.csv",
                   model_path="model/random_forest_model.pkl",
-                  output_csv="data/output/Final_score/final_sorted_results.csv"):
+                  output_dir="data/output/Final_score/"):
     try:
         probabilities = load_and_predict(probabilities_csv, model_path)
         full_scores = extract_full_scores(full_scores_csv)
     except Exception as e:
         raise RuntimeError(f"An error occurred during the merging process: {e}")
 
+    output_csv = output_dir + "final_sorted_results.csv"
     # Merge the two parts of data
     merged_data = pd.merge(probabilities, full_scores, on='lamp_id')
     merged_data.to_csv(output_csv, index=False)
@@ -92,11 +93,11 @@ if __name__ == "__main__":
     probabilities_input = "data/output/Intermediate_file/score_into_model.csv"
     full_scores_input = "data/output/Intermediate_file/full_score_results.csv"
     model_path = "model/random_forest_model.pkl"
-    output_file = "data/output/Final_score/final_sorted_results.csv"
+    output_dir = "data/output/Final_score/"
 
     # Run the merging process
     try:
-        merge_results(probabilities_input, full_scores_input, model_path, output_file)
-        print(f"The final results have been saved to {output_file}")
+        merge_results(probabilities_input, full_scores_input, model_path, output_dir)
+        print(f"The final results have been saved to {output_dir}")
     except Exception as e:
         print(f"An error occurred: {e}")

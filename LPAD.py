@@ -6,14 +6,15 @@ from final_output import merge_results
  
 DEFAULT_INPUT_FILE = './data/input/example.fasta'
 DEFAULT_REF_FILE = '"./data/resource/hg38.fa"'
-DEFAULT_OUTPUT_DIR = './data/output/Final_score'
+DEFAULT_OUTPUT_DIR = './data/output/Final_score/'
 
-def main(input_file, ref_file, output_dir):
+def main(input_file, ref_file, output):
     find_primers(input_file)
     specificity_screening(input_file, ref_file)
     process_input_file()
     save_full_scores()
-    merge_results(output_dir)
+    merge_results(output_dir=output)
+    print(f"The final results have been saved to {output}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find primers for a given FASTA file.')

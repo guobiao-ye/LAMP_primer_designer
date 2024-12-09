@@ -13,3 +13,4 @@ dependencies:
   - blast
   - joblib
   - scipy
+  - scikit-learn

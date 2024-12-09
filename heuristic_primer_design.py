@@ -86,21 +86,23 @@ def find_primers(fasta_file):
         reverse_outer_oligos = oligos.extract_oligos(runprimer3.run_primer3(sequence, outer_primer_params, reverse=True), sequence_length,
                                               is_reverse=True)
         
-        # This chunk of code should perform mutant filtering, but still requires improvement
-        #if quasispecies_sequences:
-            #forward_inner_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            #reverse_inner_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            #forward_loop_oligos = mutant.filter_reverse_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            #reverse_loop_oligos = mutant.filter_forward_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            #forward_middle_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            #reverse_middle_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            #forward_outer_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            #reverse_outer_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
+        # This chunk of code add penalty for mutant
+        if quasispecies_sequences:
+            mutation_list = mutant.generate_mutation_list(sequence, quasispecies_sequences)
+            forward_inner_oligos = mutant.filter_forward_oligos(forward_inner_oligos, sequence, mutation_list)
+            reverse_inner_oligos = mutant.filter_reverse_oligos(reverse_inner_oligos, sequence, mutation_list)
+            forward_loop_oligos = mutant.filter_reverse_oligos(forward_loop_oligos, sequence, mutation_list)
+            reverse_loop_oligos = mutant.filter_forward_oligos(reverse_loop_oligos, sequence, mutation_list)
+            forward_middle_oligos = mutant.filter_forward_oligos(forward_middle_oligos, sequence, mutation_list)
+            reverse_middle_oligos = mutant.filter_reverse_oligos(reverse_middle_oligos, sequence, mutation_list)
+            forward_outer_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, mutation_list)
+            reverse_outer_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, mutation_list)
 
         print("All oligos found!")
         print(
             f"Number of oligos are: forward_inner - {len(forward_inner_oligos)}, reverse_inner - {len(reverse_inner_oligos)}, forward_loop - {len(forward_loop_oligos)}, reverse_loop - {len(reverse_loop_oligos)}, forward_middle - {len(forward_middle_oligos)}, reverse_middle - {len(reverse_middle_oligos)}, forward_outer - {len(forward_outer_oligos)}, reverse_outer - {len(reverse_outer_oligos)}")
-
+        
+        # This chunk of code reduces overlap
         forward_inner_candidates = overlap.reduce_primers_by_overlap(forward_inner_oligos, 60, False)
         reverse_inner_candidates = overlap.reduce_primers_by_overlap(reverse_inner_oligos, 60, True)
         forward_loop_candidates = overlap.reduce_primers_by_overlap(forward_loop_oligos, 60, True)
@@ -120,7 +122,7 @@ def find_primers(fasta_file):
             forward_loop_candidates,
             forward_middle_candidates,
             forward_outer_candidates,
-            320, 1, 25, True, 5, distance_penalties,
+            320, 1, 25, True, 0, distance_penalties,
             [1, 0.6, 1.2, 1], [1, 1, 1])
         print(f'{forward_set_count} sets of forward combinations are generated.')
 
@@ -129,7 +131,7 @@ def find_primers(fasta_file):
             reverse_loop_candidates,
             reverse_middle_candidates,
             reverse_outer_candidates,
-            320, 1, 25, True, 5, distance_penalties,
+            320, 1, 25, True, 0, distance_penalties,
             [1, 0.6, 1.2, 1], [1, 1, 1])
         print(f'{reverse_set_count} sets of reverse combinations are generated.')
 
